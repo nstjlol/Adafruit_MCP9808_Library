@@ -267,3 +267,101 @@ void Adafruit_MCP9808::getSensor(sensor_t *sensor) {
   sensor->resolution = 0.0625;
 }
 /*******************************************************/
+
+/**************************************************************************/
+/*!
+    @brief  Enables the Alert Output Control bit in the Configuration Register
+*/
+/**************************************************************************/
+void Adafruit_MCP9808::enableAlert(boolean enable) {
+  uint16_t conf_register = read16(MCP9808_REG_CONFIG);
+
+  if (enable) {
+    conf_register = conf_register | MCP9808_REG_CONFIG_ALERTCTRL;
+  } else {
+    conf_register = conf_register & ~MCP9808_REG_CONFIG_ALERTCTRL;
+  }
+  
+  write16(MCP9808_REG_CONFIG, conf_register);
+}
+
+/*!
+ * @brief Sets the alert mode of the MCP9808 sensor.
+ * 
+ * This function allows the user to set the alert mode of the MCP9808 sensor to either interrupt mode or comparator mode.
+ * 
+ * @param mode The alert mode to set. Use MCP9808_ALERT_MODE_INTERRUPT for interrupt mode and MCP9808_ALERT_MODE_COMPARATOR for comparator mode.
+ * 
+ * @see 5.2.3 - The status of the Alert output can be read using MCP9808_REG_CONFIG_ALERTSTAT
+ */
+void Adafruit_MCP9808::setAlertMode(uint16_t mode) {
+  uint16_t conf_register = read16(MCP9808_REG_CONFIG);  // read current config
+
+  if (mode == MCP9808_ALERT_MODE_INTERRUPT) {           // if mode is interrupt
+    conf_register |= MCP9808_REG_CONFIG_ALERTMODE;      // set alert mode bits by ORing with mode
+  }
+  else if (mode == MCP9808_ALERT_MODE_COMPARATOR){      // if mode is comparator
+    conf_register &= ~MCP9808_REG_CONFIG_ALERTMODE;     // clear alert mode bits by ANDing with inverse
+  }
+  write16(MCP9808_REG_CONFIG, conf_register);
+}
+
+/*! @todo - void Adafruit_MCP9808::setAlertPolarity(uint16_t polarity) {}; */
+
+/*!
+ * @brief Clears the interrupt of the MCP9808 sensor.
+ * 
+ * This function allows the user to clear the interrupt of the MCP9808 sensor.
+ */
+void Adafruit_MCP9808::clearInterrupt() {
+  uint16_t conf_register = read16(MCP9808_REG_CONFIG);
+
+  if (conf_register & MCP9808_REG_CONFIG_ALERTSTAT) {
+    conf_register |= MCP9808_REG_CONFIG_INTCLR;
+  }
+  
+  write16(MCP9808_REG_CONFIG, conf_register);
+}
+
+/*!
+ * @brief Writes the upper temperature threshold of the MCP9808 sensor.
+ * 
+ * This function allows the user to set the upper temperature threshold of the MCP9808 sensor.
+ * 
+ * @param temp The temperature to set as the upper threshold.
+ */
+void Adafruit_MCP9808::writeUpperTempThreshold(float temp) {
+  write16(MCP9808_REG_UPPER_TEMP, floatToThreshold(temp));
+}
+
+/*!
+ * @brief Writes the lower temperature threshold of the MCP9808 sensor.
+ * 
+ * This function allows the user to set the lower temperature threshold of the MCP9808 sensor.
+ * 
+ * @param temp The temperature to set as the lower threshold.
+ */
+void Adafruit_MCP9808::writeLowerTempThreshold(float temp) {
+  write16(MCP9808_REG_LOWER_TEMP, floatToThreshold(temp));
+}
+
+/*!
+ * @brief Converts a float temperature to a threshold value for the MCP9808 sensor.
+ * 
+ * This function allows the user to convert a float temperature value to a threshold value that can be used with the MCP9808 sensor.
+ * 
+ * @param temp The temperature to convert.
+ * 
+ * @return The converted threshold value.
+ */
+int16_t Adafruit_MCP9808::floatToThreshold(float temp) {
+  int16_t threshold;
+  if (temp < 0) {
+    threshold = static_cast<int16_t>(-temp * 16)
+    t |= 0x1000;
+  } else {
+    threshold = static_cast<int16_t>(temp * 16);
+  }
+
+  return threshold;
+}

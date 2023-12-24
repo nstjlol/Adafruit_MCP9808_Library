@@ -41,7 +41,15 @@
 #define MCP9808_REG_AMBIENT_TEMP 0x05 ///< ambient temperature
 #define MCP9808_REG_MANUF_ID 0x06     ///< manufacture ID
 #define MCP9808_REG_DEVICE_ID 0x07    ///< device ID
-#define MCP9808_REG_RESOLUTION 0x08   ///< resolutin
+#define MCP9808_REG_RESOLUTION 0x08   ///< resolution
+
+#define MCP9808_ALERT_MODE_INTERRUPT 0x00  ///< interrupt mode
+#define MCP9808_ALERT_MODE_COMPARATOR 0x01 ///< comparator mode
+
+#define MCP9808_REG_CONFIG_RES_5 0x00 ///< +0.5C resolution
+#define MCP9808_REG_CONFIG_RES_25 0x01 ///< +0.25C resolution
+#define MCP9808_REG_CONFIG_RES_125 0x02 ///< +0.125C resolution
+#define MCP9808_REG_CONFIG_RES_0625 0x03 ///< +0.0625C resolution
 
 /*!
  *    @brief  Class that stores state and functions for interacting with
@@ -75,9 +83,17 @@ public:
   bool getEvent(sensors_event_t *);
   void getSensor(sensor_t *);
 
+  /* Alert functions */
+  void enableAlert();
+  void setAlertMode(uint16_t mode);
+  void clearInterrupt();
+  void writeUpperTempThreshold(float temp);
+  void writeLowerTempThreshold(float temp);
+
 private:
   uint16_t _sensorID = 9808; ///< ID number for temperature
   Adafruit_I2CDevice *i2c_dev = NULL;
+  uint16_t floatToThreshold(float temp);
 };
 
 #endif
