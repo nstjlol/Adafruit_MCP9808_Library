@@ -295,13 +295,13 @@ void Adafruit_MCP9808::enableAlert(boolean enable) {
  * @see 5.2.3 - The status of the Alert output can be read using MCP9808_REG_CONFIG_ALERTSTAT
  */
 void Adafruit_MCP9808::setAlertMode(uint16_t mode) {
-  uint16_t conf_register = read16(MCP9808_REG_CONFIG);  // read current config
+  uint16_t conf_register = read16(MCP9808_REG_CONFIG);
 
-  if (mode == MCP9808_ALERT_MODE_INTERRUPT) {           // if mode is interrupt
-    conf_register |= MCP9808_REG_CONFIG_ALERTMODE;      // set alert mode bits by ORing with mode
+  if (mode == MCP9808_ALERT_MODE_INTERRUPT) {
+    conf_register |= MCP9808_REG_CONFIG_ALERTMODE;
   }
-  else if (mode == MCP9808_ALERT_MODE_COMPARATOR){      // if mode is comparator
-    conf_register &= ~MCP9808_REG_CONFIG_ALERTMODE;     // clear alert mode bits by ANDing with inverse
+  else {
+    conf_register &= ~MCP9808_REG_CONFIG_ALERTMODE;
   }
   write16(MCP9808_REG_CONFIG, conf_register);
 }
@@ -324,31 +324,25 @@ void Adafruit_MCP9808::clearInterrupt() {
 }
 
 /*!
- * @brief Writes the upper temperature threshold of the MCP9808 sensor.
- * 
- * This function allows the user to set the upper temperature threshold of the MCP9808 sensor.
- * 
- * @param temp The temperature to set as the upper threshold.
+ * @brief Writes the upper temperature threshold of the MCP9808 sensors alert.
+ *  
+ * @param temp The temperature to set as the upper threshold in celsius.
  */
 void Adafruit_MCP9808::writeUpperTempThreshold(float temp) {
   write16(MCP9808_REG_UPPER_TEMP, floatToThreshold(temp));
 }
 
 /*!
- * @brief Writes the lower temperature threshold of the MCP9808 sensor.
+ * @brief Writes the lower temperature threshold of the MCP9808 sensor alert.
  * 
- * This function allows the user to set the lower temperature threshold of the MCP9808 sensor.
- * 
- * @param temp The temperature to set as the lower threshold.
+ * @param temp The temperature to set as the lower threshold in celsius.
  */
 void Adafruit_MCP9808::writeLowerTempThreshold(float temp) {
   write16(MCP9808_REG_LOWER_TEMP, floatToThreshold(temp));
 }
 
 /*!
- * @brief Converts a float temperature to a threshold value for the MCP9808 sensor.
- * 
- * This function allows the user to convert a float temperature value to a threshold value that can be used with the MCP9808 sensor.
+ * @brief Converts a float temperature to a format the MCP9808 sensor can use for its alerts.
  * 
  * @param temp The temperature to convert.
  * 
@@ -357,11 +351,10 @@ void Adafruit_MCP9808::writeLowerTempThreshold(float temp) {
 int16_t Adafruit_MCP9808::floatToThreshold(float temp) {
   int16_t threshold;
   if (temp < 0) {
-    threshold = static_cast<int16_t>(-temp * 16)
-    t |= 0x1000;
+    threshold = static_cast<int16_t>(-temp * 16);
+    threshold |= 0x1000;
   } else {
     threshold = static_cast<int16_t>(temp * 16);
   }
-
   return threshold;
 }
